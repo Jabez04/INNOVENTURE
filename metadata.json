@@ -1,0 +1,6 @@
+{
+  "name": "Street Ledger",
+  "description": "Simple daily cash and UPI income, expense, and business management ledger for Indian street vendors with Tamil and English bilingual support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
