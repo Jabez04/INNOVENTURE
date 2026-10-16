@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -44,13 +46,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.model.TransactionEntity
-import com.example.ui.theme.ExpenseRed
-import com.example.ui.theme.GreenIncome
-import com.example.ui.theme.GreenIncomeLight
-import com.example.ui.theme.TealDark
-import com.example.ui.theme.TealPrimary
-import com.example.ui.theme.UpiBlue
-import com.example.ui.theme.UpiBlueLight
+import com.example.ui.theme.CosmicPurpleBright
+import com.example.ui.theme.CosmicPurpleDeep
+import com.example.ui.theme.CosmicPurplePrimary
+import com.example.ui.theme.ExpensePink
+import com.example.ui.theme.GlassBorderPurple
+import com.example.ui.theme.NeonMint
+import com.example.ui.theme.NeonMintDark
+import com.example.ui.theme.NeonMintGlow
+import com.example.ui.theme.ObsidianBackground
+import com.example.ui.theme.ObsidianCard
+import com.example.ui.theme.ObsidianGlass
+import com.example.ui.theme.ObsidianSurface
+import com.example.ui.theme.TextLavender
+import com.example.ui.theme.TextMuted
+import com.example.ui.theme.TextWhite
+import com.example.ui.theme.UpiCyan
 import com.example.ui.viewmodel.StreetLedgerViewModel
 import com.example.util.AppLanguage
 import com.example.util.Formatters
@@ -75,6 +86,7 @@ fun UpiReconciliationScreen(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .background(ObsidianBackground)
             .padding(horizontal = 14.dp)
             .testTag("upi_reconciliation_screen"),
         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -84,15 +96,15 @@ fun UpiReconciliationScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
+                        .size(38.dp)
                         .clip(CircleShape)
-                        .background(UpiBlueLight),
+                        .background(Color(0x338B5CF6)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.QrCode2,
                         contentDescription = null,
-                        tint = UpiBlue,
+                        tint = CosmicPurpleBright,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -102,12 +114,12 @@ fun UpiReconciliationScreen(
                         text = StreetLedgerStrings.get("upi_reconciliation_title", language),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TealDark
+                        color = TextWhite
                     )
                     Text(
                         text = StreetLedgerStrings.get("upi_sub", language),
                         fontSize = 11.sp,
-                        color = Color.Gray
+                        color = TextLavender
                     )
                 }
             }
@@ -117,43 +129,52 @@ fun UpiReconciliationScreen(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+                border = CardDefaults.outlinedCardBorder().copy(
+                    brush = Brush.horizontalGradient(
+                        listOf(GlassBorderPurple, Color(0x158B5CF6))
+                    )
+                )
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    // Total Recorded vs Soundbox
+                Column(modifier = Modifier.padding(18.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
                             Text(
                                 text = StreetLedgerStrings.get("logged_upi_total", language),
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = TextLavender
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = Formatters.formatRupee(totalLoggedUpi),
-                                fontSize = 24.sp,
+                                fontSize = 26.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = UpiBlue
+                                color = CosmicPurpleBright
                             )
                         }
 
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (difference == 0.0) GreenIncomeLight else Color(0xFFFFF3E0),
-                            modifier = Modifier.align(Alignment.CenterVertically)
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (difference == 0.0) NeonMintGlow else Color(0x33FF5252),
+                            modifier = Modifier.border(
+                                1.dp,
+                                if (difference == 0.0) NeonMint else ExpensePink,
+                                RoundedCornerShape(12.dp)
+                            )
                         ) {
                             Text(
                                 text = if (difference == 0.0)
                                     "Balanced ✓"
                                 else
                                     "Diff: ${Formatters.formatRupee(abs(difference))}",
-                                fontSize = 13.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (difference == 0.0) GreenIncome else Color(0xFFE65100),
+                                color = if (difference == 0.0) NeonMint else ExpensePink,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                             )
                         }
@@ -165,23 +186,27 @@ fun UpiReconciliationScreen(
                     OutlinedTextField(
                         value = soundboxInput,
                         onValueChange = { viewModel.updateSoundboxInput(it) },
-                        label = { Text(StreetLedgerStrings.get("bank_soundbox_total", language)) },
-                        placeholder = { Text(Formatters.formatPlainAmount(totalLoggedUpi)) },
+                        label = { Text(StreetLedgerStrings.get("bank_soundbox_total", language), color = TextLavender) },
+                        placeholder = { Text(Formatters.formatPlainAmount(totalLoggedUpi), color = TextMuted) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.VolumeUp,
                                 contentDescription = null,
-                                tint = TealPrimary
+                                tint = CosmicPurpleBright
                             )
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(14.dp),
                         modifier = Modifier
                             .fillMaxWidth()
                             .testTag("soundbox_input_field"),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = Color(0xFFF7FAF9),
-                            unfocusedContainerColor = Color(0xFFF7FAF9)
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
                         )
                     )
 
@@ -190,8 +215,12 @@ fun UpiReconciliationScreen(
                     // Status Pill
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp),
-                        color = if (difference == 0.0) GreenIncomeLight else Color(0xFFFFECEB)
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (difference == 0.0) Color(0x1A00F298) else Color(0x22FF5252),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            if (difference == 0.0) Color(0x4400F298) else Color(0x44FF5252)
+                        )
                     ) {
                         Text(
                             text = if (difference == 0.0)
@@ -200,8 +229,8 @@ fun UpiReconciliationScreen(
                                 "Attention: Difference of ${Formatters.formatRupee(abs(difference))}. Check unverified entries below.",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
-                            color = if (difference == 0.0) GreenIncome else ExpenseRed,
-                            modifier = Modifier.padding(10.dp)
+                            color = if (difference == 0.0) NeonMint else ExpensePink,
+                            modifier = Modifier.padding(12.dp)
                         )
                     }
                 }
@@ -219,38 +248,49 @@ fun UpiReconciliationScreen(
                     text = "Today's UPI Receipts (${verifiedCount}/${upiTransactions.size} Verified)",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TealDark
+                    color = TextWhite
                 )
 
                 if (upiTransactions.isNotEmpty() && verifiedCount < upiTransactions.size) {
-                    Button(
-                        onClick = { viewModel.reconcileAllTodayUpi() },
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(NeonMint)
+                            .clickable { viewModel.reconcileAllTodayUpi() }
+                            .padding(horizontal = 14.dp, vertical = 8.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.DoneAll,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = StreetLedgerStrings.get("reconcile_all", language),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.DoneAll,
+                                contentDescription = null,
+                                tint = NeonMintDark,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = StreetLedgerStrings.get("reconcile_all", language),
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = NeonMintDark
+                            )
+                        }
                     }
                 }
             }
         }
 
-        // List of UPI transactions with 1-tap checkmark
+        // List of UPI transactions
         if (upiTransactions.isEmpty()) {
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+                    border = CardDefaults.outlinedCardBorder().copy(
+                        brush = Brush.horizontalGradient(
+                            listOf(GlassBorderPurple, Color(0x158B5CF6))
+                        )
+                    )
                 ) {
                     Box(
                         modifier = Modifier
@@ -260,7 +300,7 @@ fun UpiReconciliationScreen(
                     ) {
                         Text(
                             text = "No UPI payments recorded today yet.\nTransactions logged with '+ UPI In' appear here for verification.",
-                            color = Color.Gray,
+                            color = TextMuted,
                             fontSize = 13.sp
                         )
                     }
@@ -279,7 +319,7 @@ fun UpiReconciliationScreen(
         }
 
         item {
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(100.dp))
         }
     }
 }
@@ -294,11 +334,18 @@ fun UpiAuditRow(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("upi_audit_${transaction.id}"),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (transaction.isUpiReconciled) Color.White else Color(0xFFFFFDE7)
+            containerColor = if (transaction.isUpiReconciled) ObsidianCard else Color(0xFF201636)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = Brush.horizontalGradient(
+                listOf(
+                    if (transaction.isUpiReconciled) GlassBorderPurple else Color(0x668B5CF6),
+                    Color(0x108B5CF6)
+                )
+            )
+        )
     ) {
         Row(
             modifier = Modifier
@@ -313,12 +360,12 @@ fun UpiAuditRow(
                         text = Formatters.formatRupee(transaction.amount),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = UpiBlue
+                        color = CosmicPurpleBright
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Surface(
                         shape = RoundedCornerShape(6.dp),
-                        color = if (transaction.isUpiReconciled) GreenIncomeLight else Color(0xFFFFE0B2)
+                        color = if (transaction.isUpiReconciled) NeonMintGlow else Color(0x33FF9800)
                     ) {
                         Text(
                             text = if (transaction.isUpiReconciled)
@@ -327,7 +374,7 @@ fun UpiAuditRow(
                                 StreetLedgerStrings.get("status_unverified", language),
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (transaction.isUpiReconciled) GreenIncome else Color(0xFFE65100),
+                            color = if (transaction.isUpiReconciled) NeonMint else Color(0xFFFFB74D),
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         )
                     }
@@ -335,29 +382,32 @@ fun UpiAuditRow(
                 Text(
                     text = "${transaction.category} • ${Formatters.formatTime(transaction.timestamp)}",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = TextLavender
                 )
                 if (transaction.note.isNotBlank()) {
                     Text(
                         text = transaction.note,
                         fontSize = 11.sp,
-                        color = Color.DarkGray
+                        color = TextMuted
                     )
                 }
             }
 
-            // Clickable Verification Button
             Surface(
                 modifier = Modifier
                     .clip(CircleShape)
                     .clickable { onToggleVerify() },
                 shape = CircleShape,
-                color = if (transaction.isUpiReconciled) GreenIncomeLight else Color(0xFFEEEEEE)
+                color = if (transaction.isUpiReconciled) NeonMintGlow else ObsidianGlass,
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    if (transaction.isUpiReconciled) NeonMint else Color(0x448B5CF6)
+                )
             ) {
                 Icon(
                     imageVector = if (transaction.isUpiReconciled) Icons.Default.CheckCircle else Icons.Default.Pending,
                     contentDescription = "Toggle status",
-                    tint = if (transaction.isUpiReconciled) GreenIncome else Color.Gray,
+                    tint = if (transaction.isUpiReconciled) NeonMint else TextMuted,
                     modifier = Modifier
                         .padding(8.dp)
                         .size(24.dp)

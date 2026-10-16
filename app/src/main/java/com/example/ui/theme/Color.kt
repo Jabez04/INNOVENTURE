@@ -2,32 +2,31 @@ package com.example.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand Palette: Deep Teal, Fresh Green, Clean Light Surface
-val TealPrimary = Color(0xFF00695C)
-val TealDark = Color(0xFF004D40)
-val TealContainer = Color(0xFFB2DFDB)
-val OnTealContainer = Color(0xFF00201B)
+// SphereAi & ConvoCraft Exact Theme Colors
+val ObsidianBackground = Color(0xFF080511)
+val ObsidianSurface = Color(0xFF100A1F)
+val ObsidianCard = Color(0xFF19122C)
+val ObsidianCardElevated = Color(0xFF22183C)
+val ObsidianGlass = Color(0x401D1438)
 
-val GreenIncome = Color(0xFF2E7D32)
-val GreenIncomeLight = Color(0xFFE8F5E9)
-val GreenIncomeDark = Color(0xFF1B5E20)
+val CosmicPurplePrimary = Color(0xFF8B5CF6)
+val CosmicPurpleGlow = Color(0xFFA78BFA)
+val CosmicPurpleBright = Color(0xFFC084FC)
+val CosmicPurpleDeep = Color(0xFF4C1D95)
 
-val ExpenseRed = Color(0xFFD32F2F)
-val ExpenseRedLight = Color(0xFFFFEBEE)
+// The iconic Neon Mint Green from the logo & "AI Chat" pill
+val NeonMint = Color(0xFF00F298)
+val NeonMintDark = Color(0xFF07050E)
+val NeonMintGlow = Color(0x3300F298)
 
-val UpiBlue = Color(0xFF1565C0)
-val UpiBlueLight = Color(0xFFE3F2FD)
+// Text Colors
+val TextWhite = Color(0xFFFFFFFF)
+val TextLavender = Color(0xFFA59EC1)
+val TextMuted = Color(0xFF6F678F)
 
-val CashGold = Color(0xFFE65100)
-val CashGoldLight = Color(0xFFFFF3E0)
-
-val BackgroundLight = Color(0xFFF6F9F8)
-val SurfaceLight = Color(0xFFFFFFFF)
-val SurfaceVariantLight = Color(0xFFE9F1EF)
-val BorderLight = Color(0xFFD3E1DD)
-
-val DarkTealPrimary = Color(0xFF80CBC4)
-val DarkTealContainer = Color(0xFF004D40)
-val DarkBackground = Color(0xFF121A18)
-val DarkSurface = Color(0xFF1A2522)
-val DarkSurfaceVariant = Color(0xFF253430)
+// Accents & Borders
+val GlassBorderPurple = Color(0x559D7BFF)
+val GlassBorderSubtle = Color(0x22FFFFFF)
+val GlowPillBorder = Color(0x808B5CF6)
+val ExpensePink = Color(0xFFFF5252)
+val UpiCyan = Color(0xFF00E5FF)

@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,11 +16,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Backspace
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.QrCode2
@@ -31,14 +30,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -47,16 +45,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.TransactionEntity
-import com.example.ui.theme.CashGold
-import com.example.ui.theme.CashGoldLight
-import com.example.ui.theme.ExpenseRed
-import com.example.ui.theme.ExpenseRedLight
-import com.example.ui.theme.GreenIncome
-import com.example.ui.theme.GreenIncomeLight
-import com.example.ui.theme.TealDark
-import com.example.ui.theme.TealPrimary
-import com.example.ui.theme.UpiBlue
-import com.example.ui.theme.UpiBlueLight
+import com.example.ui.theme.CosmicPurpleBright
+import com.example.ui.theme.CosmicPurpleDeep
+import com.example.ui.theme.CosmicPurpleGlow
+import com.example.ui.theme.CosmicPurplePrimary
+import com.example.ui.theme.ExpensePink
+import com.example.ui.theme.GlassBorderPurple
+import com.example.ui.theme.GlowPillBorder
+import com.example.ui.theme.NeonMint
+import com.example.ui.theme.NeonMintDark
+import com.example.ui.theme.NeonMintGlow
+import com.example.ui.theme.ObsidianCard
+import com.example.ui.theme.ObsidianCardElevated
+import com.example.ui.theme.ObsidianGlass
+import com.example.ui.theme.ObsidianSurface
+import com.example.ui.theme.TextLavender
+import com.example.ui.theme.TextMuted
+import com.example.ui.theme.TextWhite
+import com.example.ui.theme.UpiCyan
 import com.example.ui.viewmodel.TodayBusinessSummary
 import com.example.util.AppLanguage
 import com.example.util.Formatters
@@ -73,16 +79,18 @@ fun BusinessSummaryCard(
         modifier = modifier
             .fillMaxWidth()
             .testTag("business_summary_card"),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = Brush.linearGradient(
+                listOf(GlassBorderPurple, Color(0x158B5CF6))
+            )
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
             // Header Row
             Row(
@@ -94,22 +102,28 @@ fun BusinessSummaryCard(
                     text = StreetLedgerStrings.get("business_today", language),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TealDark
+                    color = TextWhite
                 )
+
+                // Luminous Profit Badge
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = if (summary.netProfit >= 0) GreenIncomeLight else ExpenseRedLight,
-                    modifier = Modifier.padding(2.dp)
+                    shape = RoundedCornerShape(14.dp),
+                    color = if (summary.netProfit >= 0) NeonMintGlow else Color(0x33FF5252),
+                    modifier = Modifier.border(
+                        1.dp,
+                        if (summary.netProfit >= 0) NeonMint else ExpensePink,
+                        RoundedCornerShape(14.dp)
+                    )
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = if (summary.netProfit >= 0) Icons.Default.TrendingUp else Icons.Default.TrendingDown,
                             contentDescription = null,
-                            tint = if (summary.netProfit >= 0) GreenIncome else ExpenseRed,
-                            modifier = Modifier.size(16.dp)
+                            tint = if (summary.netProfit >= 0) NeonMint else ExpensePink,
+                            modifier = Modifier.size(15.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
@@ -118,115 +132,114 @@ fun BusinessSummaryCard(
                             } else {
                                 "${StreetLedgerStrings.get("net_loss", language)}: ${Formatters.formatRupee(-summary.netProfit)}"
                             },
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (summary.netProfit >= 0) GreenIncome else ExpenseRed
+                            color = if (summary.netProfit >= 0) NeonMint else ExpensePink
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // 2 Columns: Total Income vs Total Expense
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Income Card
+                // Income Glass Card
                 Surface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(14.dp),
-                    color = GreenIncomeLight
+                    shape = RoundedCornerShape(16.dp),
+                    color = ObsidianCardElevated
                 ) {
                     Column(
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier
+                            .padding(14.dp)
+                            .border(1.dp, Color(0x2200F298), RoundedCornerShape(16.dp))
+                            .padding(2.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.ArrowDownward,
                                 contentDescription = null,
-                                tint = GreenIncome,
+                                tint = NeonMint,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = StreetLedgerStrings.get("today_income", language),
-                                fontSize = 12.sp,
+                                fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = GreenIncome
+                                color = TextLavender
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = Formatters.formatRupee(summary.totalIncome),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = GreenIncome
+                            color = NeonMint
                         )
                         Spacer(modifier = Modifier.height(6.dp))
-                        // Cash vs UPI Pills
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = "Cash: ${Formatters.formatRupee(summary.cashIncome)}",
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF2E5E36)
+                                color = TextLavender
                             )
-                            Text(
-                                text = "|",
-                                fontSize = 10.sp,
-                                color = Color.Gray
-                            )
+                            Text("•", fontSize = 10.sp, color = TextMuted)
                             Text(
                                 text = "UPI: ${Formatters.formatRupee(summary.upiIncome)}",
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = UpiBlue
+                                color = CosmicPurpleGlow
                             )
                         }
                     }
                 }
 
-                // Expense Card
+                // Expense Glass Card
                 Surface(
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(14.dp),
-                    color = ExpenseRedLight
+                    shape = RoundedCornerShape(16.dp),
+                    color = ObsidianCardElevated
                 ) {
                     Column(
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier
+                            .padding(14.dp)
+                            .border(1.dp, Color(0x22FF5252), RoundedCornerShape(16.dp))
+                            .padding(2.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.ArrowUpward,
                                 contentDescription = null,
-                                tint = ExpenseRed,
+                                tint = ExpensePink,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = StreetLedgerStrings.get("today_expenses", language),
-                                fontSize = 12.sp,
+                                fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = ExpenseRed
+                                color = TextLavender
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text = Formatters.formatRupee(summary.totalExpense),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = ExpenseRed
+                            color = ExpensePink
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "${summary.transactionCount} transactions today",
+                            text = "${summary.transactionCount} transactions",
                             fontSize = 10.sp,
-                            color = Color.DarkGray
+                            color = TextMuted
                         )
                     }
                 }
@@ -254,9 +267,13 @@ fun TactileNumpad(
         modifier = modifier
             .fillMaxWidth()
             .testTag("tactile_numpad_card"),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = Brush.linearGradient(
+                listOf(GlassBorderPurple, Color(0x158B5CF6))
+            )
+        )
     ) {
         Column(
             modifier = Modifier
@@ -268,13 +285,14 @@ fun TactileNumpad(
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("amount_display_surface"),
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xFFF1F6F4)
+                shape = RoundedCornerShape(16.dp),
+                color = ObsidianSurface,
+                border = androidx.compose.foundation.BorderStroke(1.dp, GlassBorderPurple)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                        .padding(horizontal = 18.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -282,13 +300,13 @@ fun TactileNumpad(
                         text = "₹",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TealDark
+                        color = NeonMint
                     )
                     Text(
                         text = if (amount.isEmpty() || amount == "0") "0" else amount,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (amount == "0") Color.Gray else TealPrimary,
+                        color = if (amount == "0") TextMuted else TextWhite,
                         modifier = Modifier.testTag("amount_text")
                     )
                 }
@@ -296,7 +314,7 @@ fun TactileNumpad(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Quick Amount Increment Chips (+10, +20, +50, +100, +500)
+            // Quick Chips (+10, +20, +50, +100, +500)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -313,15 +331,16 @@ fun TactileNumpad(
                                 onIncrement(inc)
                             }
                             .testTag("chip_add_$inc"),
-                        color = Color(0xFFE8F2EF),
-                        shape = RoundedCornerShape(10.dp)
+                        color = ObsidianGlass,
+                        shape = RoundedCornerShape(10.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0x338B5CF6))
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
                                 text = "+₹$inc",
-                                fontSize = 12.sp,
+                                fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = TealDark
+                                color = CosmicPurpleBright
                             )
                         }
                     }
@@ -350,7 +369,7 @@ fun TactileNumpad(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(14.dp))
                                 .clickable {
                                     Haptics.tick(context)
                                     when (key) {
@@ -361,26 +380,37 @@ fun TactileNumpad(
                                 }
                                 .testTag("num_key_$key"),
                             color = when (key) {
-                                "C" -> Color(0xFFFFECEB)
-                                "⌫" -> Color(0xFFF0F3F2)
-                                else -> Color(0xFFF7FAF9)
+                                "C" -> Color(0x33FF5252)
+                                "⌫" -> Color(0x228B5CF6)
+                                else -> ObsidianGlass
                             },
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(14.dp),
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                when (key) {
+                                    "C" -> Color(0x66FF5252)
+                                    "⌫" -> Color(0x448B5CF6)
+                                    else -> Color(0x22FFFFFF)
+                                }
+                            )
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 if (key == "⌫") {
                                     Icon(
                                         imageVector = Icons.Default.Backspace,
                                         contentDescription = "Backspace",
-                                        tint = Color.DarkGray,
-                                        modifier = Modifier.size(20.dp)
+                                        tint = TextLavender,
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 } else {
                                     Text(
                                         text = key,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (key == "C") ExpenseRed else Color(0xFF263238)
+                                        color = when (key) {
+                                            "C" -> ExpensePink
+                                            else -> TextWhite
+                                        }
                                     )
                                 }
                             }
@@ -391,100 +421,115 @@ fun TactileNumpad(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Big Action Buttons: + Cash In, + UPI In, - Expense
+            // Glowing Capsule Action Buttons: + Cash In, + UPI In, - Expense
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Cash In Button
-                Button(
-                    onClick = {
-                        Haptics.tick(context)
-                        onCashIn()
-                    },
+                // Cash In Button (Neon Mint Pill)
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(NeonMint)
+                        .clickable {
+                            Haptics.tick(context)
+                            onCashIn()
+                        }
                         .testTag("btn_cash_in"),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenIncome)
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Payments,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            tint = NeonMintDark,
+                            modifier = Modifier.size(16.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = StreetLedgerStrings.get("action_cash_in", language),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            color = NeonMintDark
                         )
                     }
                 }
 
-                // UPI In Button
-                Button(
-                    onClick = {
-                        Haptics.tick(context)
-                        onUpiIn()
-                    },
+                // UPI In Button (Glowing Cosmic Purple Pill)
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(CosmicPurpleDeep, CosmicPurplePrimary)
+                            )
+                        )
+                        .border(1.dp, CosmicPurpleBright, RoundedCornerShape(26.dp))
+                        .clickable {
+                            Haptics.tick(context)
+                            onUpiIn()
+                        }
                         .testTag("btn_upi_in"),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = UpiBlue)
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.QrCode2,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            tint = TextWhite,
+                            modifier = Modifier.size(16.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = StreetLedgerStrings.get("action_upi_in", language),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            color = TextWhite
                         )
                     }
                 }
 
-                // Expense Out Button
-                Button(
-                    onClick = {
-                        Haptics.tick(context)
-                        onExpenseOut()
-                    },
+                // Expense Out Button (Dark Coral Glow Pill)
+                Box(
                     modifier = Modifier
                         .weight(1f)
                         .height(52.dp)
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(Color(0x33FF5252))
+                        .border(1.5.dp, ExpensePink, RoundedCornerShape(26.dp))
+                        .clickable {
+                            Haptics.tick(context)
+                            onExpenseOut()
+                        }
                         .testTag("btn_expense_out"),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = ExpenseRed)
+                    contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowUpward,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            tint = ExpensePink,
+                            modifier = Modifier.size(16.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = StreetLedgerStrings.get("action_expense_out", language),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            color = ExpensePink
                         )
                     }
                 }
@@ -504,14 +549,18 @@ fun TransactionItemRow(
         modifier = modifier
             .fillMaxWidth()
             .testTag("tx_item_${transaction.id}"),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = Brush.horizontalGradient(
+                listOf(Color(0x338B5CF6), Color(0x108B5CF6))
+            )
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -519,16 +568,16 @@ fun TransactionItemRow(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                // Payment Mode Badge
+                // Badge
                 Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
                         .background(
                             when {
-                                transaction.type == "EXPENSE" -> ExpenseRedLight
-                                transaction.paymentMode == "UPI" -> UpiBlueLight
-                                else -> GreenIncomeLight
+                                transaction.type == "EXPENSE" -> Color(0x33FF5252)
+                                transaction.paymentMode == "UPI" -> Color(0x338B5CF6)
+                                else -> NeonMintGlow
                             }
                         ),
                     contentAlignment = Alignment.Center
@@ -541,9 +590,9 @@ fun TransactionItemRow(
                         },
                         contentDescription = null,
                         tint = when {
-                            transaction.type == "EXPENSE" -> ExpenseRed
-                            transaction.paymentMode == "UPI" -> UpiBlue
-                            else -> GreenIncome
+                            transaction.type == "EXPENSE" -> ExpensePink
+                            transaction.paymentMode == "UPI" -> CosmicPurpleBright
+                            else -> NeonMint
                         },
                         modifier = Modifier.size(20.dp)
                     )
@@ -557,18 +606,18 @@ fun TransactionItemRow(
                             text = transaction.category,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E2825)
+                            color = TextWhite
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Surface(
                             shape = RoundedCornerShape(6.dp),
-                            color = if (transaction.paymentMode == "UPI") UpiBlueLight else CashGoldLight
+                            color = if (transaction.paymentMode == "UPI") Color(0x338B5CF6) else NeonMintGlow
                         ) {
                             Text(
                                 text = transaction.paymentMode,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (transaction.paymentMode == "UPI") UpiBlue else CashGold,
+                                color = if (transaction.paymentMode == "UPI") CosmicPurpleBright else NeonMint,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
@@ -577,13 +626,13 @@ fun TransactionItemRow(
                         Text(
                             text = transaction.note,
                             fontSize = 12.sp,
-                            color = Color.Gray
+                            color = TextLavender
                         )
                     }
                     Text(
                         text = Formatters.formatTime(transaction.timestamp),
                         fontSize = 11.sp,
-                        color = Color.LightGray
+                        color = TextMuted
                     )
                 }
             }
@@ -593,7 +642,7 @@ fun TransactionItemRow(
                     text = if (transaction.type == "INCOME") "+${Formatters.formatRupee(transaction.amount)}" else "-${Formatters.formatRupee(transaction.amount)}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = if (transaction.type == "INCOME") GreenIncome else ExpenseRed
+                    color = if (transaction.type == "INCOME") NeonMint else ExpensePink
                 )
                 IconButton(
                     onClick = onDelete,
@@ -602,7 +651,7 @@ fun TransactionItemRow(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Color.LightGray,
+                        tint = TextMuted,
                         modifier = Modifier.size(18.dp)
                     )
                 }

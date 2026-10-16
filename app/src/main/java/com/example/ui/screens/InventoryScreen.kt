@@ -1,6 +1,8 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,8 +31,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -49,11 +52,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.model.InventoryItemEntity
-import com.example.ui.theme.ExpenseRed
-import com.example.ui.theme.ExpenseRedLight
-import com.example.ui.theme.GreenIncome
-import com.example.ui.theme.TealDark
-import com.example.ui.theme.TealPrimary
+import com.example.ui.theme.CosmicPurpleBright
+import com.example.ui.theme.ExpensePink
+import com.example.ui.theme.GlassBorderPurple
+import com.example.ui.theme.NeonMint
+import com.example.ui.theme.NeonMintDark
+import com.example.ui.theme.NeonMintGlow
+import com.example.ui.theme.ObsidianBackground
+import com.example.ui.theme.ObsidianCard
+import com.example.ui.theme.ObsidianCardElevated
+import com.example.ui.theme.ObsidianSurface
+import com.example.ui.theme.TextLavender
+import com.example.ui.theme.TextMuted
+import com.example.ui.theme.TextWhite
 import com.example.ui.viewmodel.StreetLedgerViewModel
 import com.example.util.AppLanguage
 import com.example.util.Formatters
@@ -69,14 +80,17 @@ fun InventoryScreen(
 
     var showAddDialog by remember { mutableStateOf(false) }
 
-    // Calculate restock cost estimate for low stock items
     val lowStockItems = inventoryItems.filter { it.quantity <= it.minThreshold }
     val totalRestockCost = lowStockItems.sumOf { item ->
         val deficit = maxOf(0.0, (item.minThreshold * 2) - item.quantity)
         deficit * item.unitCost
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(ObsidianBackground)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -88,26 +102,31 @@ fun InventoryScreen(
             // Title
             Text(
                 text = StreetLedgerStrings.get("inventory_title", language),
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = TealDark
+                color = TextWhite
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Restock Cost Estimate Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (lowStockItems.isNotEmpty()) ExpenseRedLight else Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+                border = CardDefaults.outlinedCardBorder().copy(
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            if (lowStockItems.isNotEmpty()) Color(0x66FF5252) else Color(0x6600F298),
+                            Color(0x228B5CF6)
+                        )
+                    )
+                )
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(14.dp),
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -117,7 +136,7 @@ fun InventoryScreen(
                                 Icon(
                                     imageVector = Icons.Default.Warning,
                                     contentDescription = null,
-                                    tint = ExpenseRed,
+                                    tint = ExpensePink,
                                     modifier = Modifier.size(18.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -129,14 +148,14 @@ fun InventoryScreen(
                                     "All Stock Levels Healthy ✓",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (lowStockItems.isNotEmpty()) ExpenseRed else GreenIncome
+                                color = if (lowStockItems.isNotEmpty()) ExpensePink else NeonMint
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "${StreetLedgerStrings.get("restock_cost_estimate", language)}: ${Formatters.formatRupee(totalRestockCost)}",
                             fontSize = 12.sp,
-                            color = Color.DarkGray
+                            color = TextLavender
                         )
                     }
 
@@ -144,20 +163,20 @@ fun InventoryScreen(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(if (lowStockItems.isNotEmpty()) Color.White else Color(0xFFE8F5E9)),
+                            .background(if (lowStockItems.isNotEmpty()) Color(0x33FF5252) else NeonMintGlow),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.Inventory2,
                             contentDescription = null,
-                            tint = if (lowStockItems.isNotEmpty()) ExpenseRed else GreenIncome,
+                            tint = if (lowStockItems.isNotEmpty()) ExpensePink else NeonMint,
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Inventory Items List
             LazyColumn(
@@ -173,7 +192,7 @@ fun InventoryScreen(
                     )
                 }
                 item {
-                    Spacer(modifier = Modifier.height(80.dp))
+                    Spacer(modifier = Modifier.height(100.dp))
                 }
             }
         }
@@ -183,10 +202,10 @@ fun InventoryScreen(
             onClick = { showAddDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 80.dp)
+                .padding(end = 16.dp, bottom = 90.dp)
                 .testTag("fab_add_inventory"),
-            containerColor = TealPrimary,
-            contentColor = Color.White
+            containerColor = NeonMint,
+            contentColor = NeonMintDark
         ) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
@@ -203,6 +222,9 @@ fun InventoryScreen(
         var supplierInput by remember { mutableStateOf("") }
 
         AlertDialog(
+            containerColor = ObsidianCardElevated,
+            titleContentColor = TextWhite,
+            textContentColor = TextLavender,
             onDismissRequest = { showAddDialog = false },
             title = {
                 Text(
@@ -215,30 +237,62 @@ fun InventoryScreen(
                     OutlinedTextField(
                         value = nameEnInput,
                         onValueChange = { nameEnInput = it },
-                        label = { Text(StreetLedgerStrings.get("item_name_en", language)) },
+                        label = { Text(StreetLedgerStrings.get("item_name_en", language), color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = nameTaInput,
                         onValueChange = { nameTaInput = it },
-                        label = { Text(StreetLedgerStrings.get("item_name_ta", language)) },
+                        label = { Text(StreetLedgerStrings.get("item_name_ta", language), color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedTextField(
                             value = quantityInput,
                             onValueChange = { quantityInput = it },
-                            label = { Text(StreetLedgerStrings.get("quantity", language)) },
+                            label = { Text(StreetLedgerStrings.get("quantity", language), color = TextLavender) },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = ObsidianSurface,
+                                unfocusedContainerColor = ObsidianSurface,
+                                focusedBorderColor = CosmicPurpleBright,
+                                unfocusedBorderColor = Color(0x338B5CF6),
+                                focusedTextColor = TextWhite,
+                                unfocusedTextColor = TextWhite
+                            ),
                             modifier = Modifier.weight(1f)
                         )
                         OutlinedTextField(
                             value = unitInput,
                             onValueChange = { unitInput = it },
-                            label = { Text(StreetLedgerStrings.get("unit", language)) },
+                            label = { Text(StreetLedgerStrings.get("unit", language), color = TextLavender) },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = ObsidianSurface,
+                                unfocusedContainerColor = ObsidianSurface,
+                                focusedBorderColor = CosmicPurpleBright,
+                                unfocusedBorderColor = Color(0x338B5CF6),
+                                focusedTextColor = TextWhite,
+                                unfocusedTextColor = TextWhite
+                            ),
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -246,23 +300,47 @@ fun InventoryScreen(
                         OutlinedTextField(
                             value = thresholdInput,
                             onValueChange = { thresholdInput = it },
-                            label = { Text(StreetLedgerStrings.get("min_threshold", language)) },
+                            label = { Text(StreetLedgerStrings.get("min_threshold", language), color = TextLavender) },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = ObsidianSurface,
+                                unfocusedContainerColor = ObsidianSurface,
+                                focusedBorderColor = CosmicPurpleBright,
+                                unfocusedBorderColor = Color(0x338B5CF6),
+                                focusedTextColor = TextWhite,
+                                unfocusedTextColor = TextWhite
+                            ),
                             modifier = Modifier.weight(1f)
                         )
                         OutlinedTextField(
                             value = costInput,
                             onValueChange = { costInput = it },
-                            label = { Text(StreetLedgerStrings.get("unit_cost", language)) },
+                            label = { Text(StreetLedgerStrings.get("unit_cost", language), color = TextLavender) },
                             singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = ObsidianSurface,
+                                unfocusedContainerColor = ObsidianSurface,
+                                focusedBorderColor = CosmicPurpleBright,
+                                unfocusedBorderColor = Color(0x338B5CF6),
+                                focusedTextColor = TextWhite,
+                                unfocusedTextColor = TextWhite
+                            ),
                             modifier = Modifier.weight(1f)
                         )
                     }
                     OutlinedTextField(
                         value = supplierInput,
                         onValueChange = { supplierInput = it },
-                        label = { Text(StreetLedgerStrings.get("supplier", language)) },
+                        label = { Text(StreetLedgerStrings.get("supplier", language), color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -284,14 +362,14 @@ fun InventoryScreen(
                         )
                         showAddDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = NeonMint, contentColor = NeonMintDark)
                 ) {
-                    Text(StreetLedgerStrings.get("save", language))
+                    Text(StreetLedgerStrings.get("save", language), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showAddDialog = false }) {
-                    Text(StreetLedgerStrings.get("cancel", language))
+                    Text(StreetLedgerStrings.get("cancel", language), color = TextLavender)
                 }
             }
         )
@@ -312,9 +390,13 @@ fun InventoryItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("inventory_item_${item.id}"),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = Brush.horizontalGradient(
+                listOf(GlassBorderPurple, Color(0x108B5CF6))
+            )
+        )
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
@@ -328,20 +410,20 @@ fun InventoryItemCard(
                             text = displayName,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E2825)
+                            color = TextWhite
                         )
                         if (isLowStock) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Surface(
                                 shape = RoundedCornerShape(4.dp),
-                                color = ExpenseRedLight
+                                color = Color(0x33FF5252)
                             ) {
                                 Text(
                                     text = "LOW",
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = ExpenseRed,
-                                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                                    color = ExpensePink,
+                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                                 )
                             }
                         }
@@ -349,58 +431,72 @@ fun InventoryItemCard(
                     Text(
                         text = "Cost: ${Formatters.formatRupee(item.unitCost)} / ${item.unit} • Alert at < ${Formatters.formatPlainAmount(item.minThreshold)} ${item.unit}",
                         fontSize = 11.sp,
-                        color = Color.Gray
+                        color = TextLavender
                     )
                     if (item.supplierName.isNotBlank()) {
                         Text(
                             text = "Supplier: ${item.supplierName}",
                             fontSize = 11.sp,
-                            color = TealDark
+                            color = CosmicPurpleBright
                         )
                     }
                 }
 
-                // Current Quantity Badge
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "${Formatters.formatPlainAmount(item.quantity)} ${item.unit}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (isLowStock) ExpenseRed else GreenIncome
+                        color = if (isLowStock) ExpensePink else NeonMint
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Quick Stock Adjust Buttons: [-1] [-0.5] [+0.5] [+1]
+            // Quick Stock Adjust Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
-                    onClick = { onAdjust(-1.0) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(ObsidianCardElevated)
+                        .border(1.dp, GlassBorderPurple, RoundedCornerShape(10.dp))
+                        .clickable { onAdjust(-1.0) },
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("-1", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("-1", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextWhite)
                 }
 
-                OutlinedButton(
-                    onClick = { onAdjust(1.0) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(ObsidianCardElevated)
+                        .border(1.dp, GlassBorderPurple, RoundedCornerShape(10.dp))
+                        .clickable { onAdjust(1.0) },
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("+1", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("+1", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = TextWhite)
                 }
 
-                OutlinedButton(
-                    onClick = { onAdjust(5.0) },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(NeonMintGlow)
+                        .border(1.dp, NeonMint, RoundedCornerShape(10.dp))
+                        .clickable { onAdjust(5.0) },
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("+5", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("+5", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = NeonMint)
                 }
 
                 IconButton(
@@ -410,7 +506,7 @@ fun InventoryItemCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Color.LightGray,
+                        tint = TextMuted,
                         modifier = Modifier.size(18.dp)
                     )
                 }

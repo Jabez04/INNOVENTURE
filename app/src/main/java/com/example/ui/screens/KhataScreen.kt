@@ -1,6 +1,8 @@
 package com.example.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,7 +20,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
@@ -33,8 +34,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -55,12 +60,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.data.model.KhataPartyEntity
-import com.example.ui.theme.ExpenseRed
-import com.example.ui.theme.ExpenseRedLight
-import com.example.ui.theme.GreenIncome
-import com.example.ui.theme.GreenIncomeLight
-import com.example.ui.theme.TealDark
-import com.example.ui.theme.TealPrimary
+import com.example.ui.theme.CosmicPurpleBright
+import com.example.ui.theme.CosmicPurpleDeep
+import com.example.ui.theme.CosmicPurplePrimary
+import com.example.ui.theme.ExpensePink
+import com.example.ui.theme.GlassBorderPurple
+import com.example.ui.theme.GlowPillBorder
+import com.example.ui.theme.NeonMint
+import com.example.ui.theme.NeonMintDark
+import com.example.ui.theme.NeonMintGlow
+import com.example.ui.theme.ObsidianBackground
+import com.example.ui.theme.ObsidianCard
+import com.example.ui.theme.ObsidianCardElevated
+import com.example.ui.theme.ObsidianGlass
+import com.example.ui.theme.ObsidianSurface
+import com.example.ui.theme.TextLavender
+import com.example.ui.theme.TextMuted
+import com.example.ui.theme.TextWhite
 import com.example.ui.viewmodel.StreetLedgerViewModel
 import com.example.util.AppLanguage
 import com.example.util.Formatters
@@ -80,15 +96,18 @@ fun KhataScreen(
     var selectedTab by remember { mutableIntStateOf(0) } // 0: Customers, 1: Suppliers
     var showAddDialog by remember { mutableStateOf(false) }
 
-    // Dialog for Payments
     var partyForPayment by remember { mutableStateOf<KhataPartyEntity?>(null) }
-    var isPaymentReceived by remember { mutableStateOf(true) } // true: Jama, false: Udhar
+    var isPaymentReceived by remember { mutableStateOf(true) }
     var paymentAmountInput by remember { mutableStateOf("") }
 
     val totalReceivable = customers.sumOf { it.balanceDue }
     val totalPayable = suppliers.sumOf { it.balanceDue }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(ObsidianBackground)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,21 +119,29 @@ fun KhataScreen(
             // Khata Title
             Text(
                 text = StreetLedgerStrings.get("khata_title", language),
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = TealDark
+                color = TextWhite
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Tab Selector
             TabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = Color.White,
-                contentColor = TealPrimary,
+                containerColor = ObsidianCard,
+                contentColor = NeonMint,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                        color = NeonMint,
+                        height = 3.dp
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(14.dp))
+                    .border(1.dp, GlassBorderPurple, RoundedCornerShape(14.dp))
             ) {
                 Tab(
                     selected = selectedTab == 0,
@@ -123,7 +150,8 @@ fun KhataScreen(
                         Text(
                             text = StreetLedgerStrings.get("tab_customers", language),
                             fontSize = 12.sp,
-                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedTab == 0) NeonMint else TextLavender
                         )
                     }
                 )
@@ -134,23 +162,30 @@ fun KhataScreen(
                         Text(
                             text = StreetLedgerStrings.get("tab_suppliers", language),
                             fontSize = 12.sp,
-                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selectedTab == 1) NeonMint else TextLavender
                         )
                     }
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Total Balance Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (selectedTab == 0) GreenIncomeLight else ExpenseRedLight
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+                border = CardDefaults.outlinedCardBorder().copy(
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            if (selectedTab == 0) Color(0x6600F298) else Color(0x66FF5252),
+                            Color(0x228B5CF6)
+                        )
+                    )
                 )
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Text(
                         text = if (selectedTab == 0)
                             StreetLedgerStrings.get("total_receivables", language)
@@ -158,19 +193,19 @@ fun KhataScreen(
                             StreetLedgerStrings.get("total_payables", language),
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (selectedTab == 0) GreenIncome else ExpenseRed
+                        color = TextLavender
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = Formatters.formatRupee(if (selectedTab == 0) totalReceivable else totalPayable),
-                        fontSize = 26.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (selectedTab == 0) GreenIncome else ExpenseRed
+                        color = if (selectedTab == 0) NeonMint else ExpensePink
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             val currentList = if (selectedTab == 0) customers else suppliers
 
@@ -187,7 +222,7 @@ fun KhataScreen(
                         else
                             "No suppliers added yet.\nTap '+' to add wholesale suppliers.",
                         textAlign = TextAlign.Center,
-                        color = Color.Gray,
+                        color = TextMuted,
                         fontSize = 14.sp
                     )
                 }
@@ -225,21 +260,21 @@ fun KhataScreen(
                         )
                     }
                     item {
-                        Spacer(modifier = Modifier.height(80.dp))
+                        Spacer(modifier = Modifier.height(100.dp))
                     }
                 }
             }
         }
 
-        // Floating Action Button to Add Customer/Supplier
+        // Floating Action Button
         FloatingActionButton(
             onClick = { showAddDialog = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 80.dp)
+                .padding(end = 16.dp, bottom = 90.dp)
                 .testTag("fab_add_khata"),
-            containerColor = TealPrimary,
-            contentColor = Color.White
+            containerColor = NeonMint,
+            contentColor = NeonMintDark
         ) {
             Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
         }
@@ -252,6 +287,9 @@ fun KhataScreen(
         var initialBalanceInput by remember { mutableStateOf("") }
 
         AlertDialog(
+            containerColor = ObsidianCardElevated,
+            titleContentColor = TextWhite,
+            textContentColor = TextLavender,
             onDismissRequest = { showAddDialog = false },
             title = {
                 Text(
@@ -267,22 +305,46 @@ fun KhataScreen(
                     OutlinedTextField(
                         value = nameInput,
                         onValueChange = { nameInput = it },
-                        label = { Text(StreetLedgerStrings.get("name", language)) },
+                        label = { Text(StreetLedgerStrings.get("name", language), color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = phoneInput,
                         onValueChange = { phoneInput = it },
-                        label = { Text(StreetLedgerStrings.get("phone", language)) },
+                        label = { Text(StreetLedgerStrings.get("phone", language), color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
                         value = initialBalanceInput,
                         onValueChange = { initialBalanceInput = it },
-                        label = { Text(StreetLedgerStrings.get("initial_balance", language)) },
+                        label = { Text(StreetLedgerStrings.get("initial_balance", language), color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -298,14 +360,14 @@ fun KhataScreen(
                         }
                         showAddDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = TealPrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = NeonMint, contentColor = NeonMintDark)
                 ) {
-                    Text(StreetLedgerStrings.get("save", language))
+                    Text(StreetLedgerStrings.get("save", language), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showAddDialog = false }) {
-                    Text(StreetLedgerStrings.get("cancel", language))
+                    Text(StreetLedgerStrings.get("cancel", language), color = TextLavender)
                 }
             }
         )
@@ -314,6 +376,9 @@ fun KhataScreen(
     // Payment / Credit Adjustment Dialog
     partyForPayment?.let { party ->
         AlertDialog(
+            containerColor = ObsidianCardElevated,
+            titleContentColor = TextWhite,
+            textContentColor = TextLavender,
             onDismissRequest = { partyForPayment = null },
             title = {
                 Text(
@@ -330,14 +395,22 @@ fun KhataScreen(
                     Text(
                         text = "Current Balance: ${Formatters.formatRupee(party.balanceDue)}",
                         fontSize = 14.sp,
-                        color = Color.DarkGray
+                        color = TextLavender
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     OutlinedTextField(
                         value = paymentAmountInput,
                         onValueChange = { paymentAmountInput = it },
-                        label = { Text("Amount (₹)") },
+                        label = { Text("Amount (₹)", color = TextLavender) },
                         singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = ObsidianSurface,
+                            unfocusedContainerColor = ObsidianSurface,
+                            focusedBorderColor = CosmicPurpleBright,
+                            unfocusedBorderColor = Color(0x338B5CF6),
+                            focusedTextColor = TextWhite,
+                            unfocusedTextColor = TextWhite
+                        ),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -364,15 +437,16 @@ fun KhataScreen(
                         partyForPayment = null
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isPaymentReceived) GreenIncome else ExpenseRed
+                        containerColor = if (isPaymentReceived) NeonMint else ExpensePink,
+                        contentColor = if (isPaymentReceived) NeonMintDark else TextWhite
                     )
                 ) {
-                    Text(StreetLedgerStrings.get("save", language))
+                    Text(StreetLedgerStrings.get("save", language), fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { partyForPayment = null }) {
-                    Text(StreetLedgerStrings.get("cancel", language))
+                    Text(StreetLedgerStrings.get("cancel", language), color = TextLavender)
                 }
             }
         )
@@ -393,9 +467,13 @@ fun KhataPartyCard(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("khata_party_${party.id}"),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = ObsidianCard),
+        border = CardDefaults.outlinedCardBorder().copy(
+            brush = Brush.horizontalGradient(
+                listOf(GlassBorderPurple, Color(0x108B5CF6))
+            )
+        )
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Row(
@@ -408,13 +486,13 @@ fun KhataPartyCard(
                         modifier = Modifier
                             .size(38.dp)
                             .clip(CircleShape)
-                            .background(if (isCustomer) GreenIncomeLight else Color(0xFFECEFF1)),
+                            .background(if (isCustomer) NeonMintGlow else Color(0x338B5CF6)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = if (isCustomer) Icons.Default.Person else Icons.Default.Store,
                             contentDescription = null,
-                            tint = if (isCustomer) GreenIncome else TealDark,
+                            tint = if (isCustomer) NeonMint else CosmicPurpleBright,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -424,13 +502,13 @@ fun KhataPartyCard(
                             text = party.name,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E2825)
+                            color = TextWhite
                         )
                         if (party.phone.isNotBlank()) {
                             Text(
                                 text = party.phone,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = TextLavender
                             )
                         }
                     }
@@ -441,47 +519,57 @@ fun KhataPartyCard(
                         text = Formatters.formatRupee(party.balanceDue),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = if (isCustomer) GreenIncome else ExpenseRed
+                        color = if (isCustomer) NeonMint else ExpensePink
                     )
                     Text(
                         text = if (isCustomer) "You'll Get" else "You'll Pay",
                         fontSize = 10.sp,
-                        color = Color.Gray
+                        color = TextMuted
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Action Buttons Row: [Receive (Jama)] [Give Credit] [WhatsApp Reminder] [Delete]
+            // Action Buttons Row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
-                    onClick = onReceivePayment,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(38.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(NeonMintGlow)
+                        .border(1.dp, NeonMint, RoundedCornerShape(10.dp))
+                        .clickable { onReceivePayment() },
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = if (isCustomer) "Jama (Recv)" else "Pay Due",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = GreenIncome
+                        color = NeonMint
                     )
                 }
 
-                OutlinedButton(
-                    onClick = onGiveCredit,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(38.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color(0x22FF5252))
+                        .border(1.dp, ExpensePink, RoundedCornerShape(10.dp))
+                        .clickable { onGiveCredit() },
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = if (isCustomer) "+ Udhar" else "+ Bill",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = ExpenseRed
+                        color = ExpensePink
                     )
                 }
 
@@ -490,12 +578,12 @@ fun KhataPartyCard(
                         onClick = onSendReminder,
                         modifier = Modifier
                             .size(36.dp)
-                            .background(Color(0xFFE8F5E9), shape = CircleShape)
+                            .background(Color(0x3300F298), shape = CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Chat,
                             contentDescription = "WhatsApp Reminder",
-                            tint = Color(0xFF25D366),
+                            tint = NeonMint,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -508,7 +596,7 @@ fun KhataPartyCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete",
-                        tint = Color.LightGray,
+                        tint = TextMuted,
                         modifier = Modifier.size(18.dp)
                     )
                 }
